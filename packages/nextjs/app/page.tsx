@@ -45,9 +45,9 @@ const Home: NextPage = () => {
           return await walletClient.sendTransaction({
             account,
             to: walletAddress, // Sending to self for demo
-            value: parseEther("0.0001"),
-            gasLimit: BigInt(21000),
-            baseFeePerGas: BigInt(50000000000),
+            value: parseEther("0.0001"), // 0.0001 MON
+            gasLimit: BigInt(21000), // 21000 gas limit
+            baseFeePerGas: BigInt(50000000000), // 50 gwei
             chain: targetNetwork,
             nonce: nonce + Number(index),
           });
@@ -88,7 +88,8 @@ const Home: NextPage = () => {
               onChange={e => setPrivateKey(e.target.value)}
             />
             <div className="text-xs text-gray-500">
-              Note: Never expose your private key in production. This is for demonstration purposes only.
+              <div>Note: Never expose your private key in production. This is for demonstration purposes only.</div>
+              <div>Check packages/nextjs/page.tsx for the code.</div>
             </div>
 
             <input
