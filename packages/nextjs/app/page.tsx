@@ -1,12 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import type { NextPage } from "next";
+import { createWalletClient, http, parseEther } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 import { useAccount, usePublicClient } from "wagmi";
 import { Address } from "~~/components/scaffold-eth";
-import { parseEther, createWalletClient, http } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
-import { useState } from "react";
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
@@ -20,25 +20,25 @@ const Home: NextPage = () => {
 
   const handleBatchTransactions = async () => {
     if (!publicClient || !privateKey) return;
-    
+
     setIsLoading(true);
     setTxResults([]);
-    
+
     try {
       const privateKeyHex = privateKey.startsWith("0x") ? privateKey : `0x${privateKey}`;
       const account = privateKeyToAccount(privateKeyHex as `0x${string}`);
-      
+
       const walletClient = createWalletClient({
         chain: targetNetwork,
         transport: http(`https://monad-testnet.g.alchemy.com/v2/${apiKey}`),
         account,
       });
-      
+
       const walletAddress = account.address;
-      
+
       const BATCH_SIZE = batchSize;
       const nonce = await publicClient.getTransactionCount({ address: walletAddress });
-      
+
       const transactions = Array(BATCH_SIZE)
         .fill(null)
         .map(async (_, index) => {
@@ -73,7 +73,6 @@ const Home: NextPage = () => {
             <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
             <span className="block text-lg mb-2">Foundry Edition + Monad Testnet Config</span>
             <span className="block text-md mb-2">batch transactions example</span>
-
           </h1>
           <div className="flex justify-center items-center space-x-2 flex-col sm:flex-row">
             <p className="my-2 font-medium">Connected Address:</p>
@@ -86,23 +85,31 @@ const Home: NextPage = () => {
               placeholder="Enter Private Key"
               className="input input-bordered w-full"
               value={privateKey}
-              onChange={(e) => setPrivateKey(e.target.value)}
+              onChange={e => setPrivateKey(e.target.value)}
             />
             <div className="text-xs text-gray-500">
               Note: Never expose your private key in production. This is for demonstration purposes only.
             </div>
-            
+
             <input
               type="text"
               placeholder="Enter Alchemy API Key"
               className="input input-bordered w-full"
               value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
+              onChange={e => setApiKey(e.target.value)}
             />
             <div className="text-xs text-gray-500">
-              Get your own API key for Monad Testnet from <a href="https://www.alchemy.com/" target="_blank" rel="noopener noreferrer" className="link link-primary">Alchemy</a>
+              Get your own API key for Monad Testnet from{" "}
+              <a
+                href="https://www.alchemy.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link link-primary"
+              >
+                Alchemy
+              </a>
             </div>
-            
+
             <div className="w-full">
               <label className="label">
                 <span className="label-text">Batch Size: {batchSize}</span>
@@ -112,7 +119,7 @@ const Home: NextPage = () => {
                 min="1"
                 max="30"
                 value={batchSize}
-                onChange={(e) => setBatchSize(parseInt(e.target.value))}
+                onChange={e => setBatchSize(parseInt(e.target.value))}
                 className="range range-primary"
               />
               <div className="w-full flex justify-between text-xs px-2">
@@ -122,16 +129,18 @@ const Home: NextPage = () => {
                 <span>30</span>
               </div>
             </div>
-            
+
             <div className="text-sm mt-2 text-center">
-              <p><strong>Batch Size Considerations:</strong></p>
+              <p>
+                <strong>Batch Size Considerations:</strong>
+              </p>
               <ul className="list-disc text-left pl-5 mt-1">
                 <li>Maximum of 30 transactions to avoid API rate limits (429 errors)</li>
                 <li>Each transaction requires a unique nonce</li>
                 <li>You could submit more if you had an api with a larger request limit.</li>
               </ul>
             </div>
-            
+
             <button
               className="btn btn-primary w-full"
               onClick={handleBatchTransactions}
@@ -140,7 +149,7 @@ const Home: NextPage = () => {
               {isLoading ? <span className="loading loading-spinner loading-sm"></span> : null}
               Send {batchSize} Batch Transactions
             </button>
-            
+
             {txResults.length > 0 && (
               <div className="mt-4 w-full">
                 <h3 className="text-lg font-medium mb-2">Transaction Hashes:</h3>
